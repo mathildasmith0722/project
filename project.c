@@ -78,49 +78,51 @@ int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
 
 int main(){
   
-  int hours, minutes, seconds;
-  int numOfDrivers = 0;
-  int num = 1;
+    int hours, minutes, seconds;
+    int numOfDrivers = 0;
+    int booll= 1;
   
-  char rep1[1000];
-  char rep2[1000];
-  struct Racer *racerTimes = NULL;
+    char rep1[1000];
+    char rep2[1000];
+    struct Racer *racerTimes = NULL;
     
     
-    char firstLetter;
-    printf("Please enter an input: \n");
-    while(FLAG)
-  switch (firstLetter) {
-    case 'A':
-      scanf("%s %s", buffer1, buffer2);
-        numOfDrivers++;
-          driverTimes = addDriver(buffer1  , buffer2, driverTimes, numberOfElements);
-          break;
+    char letter;
+    printf("Enter a letter: \n");
+    while(booll){
+        scanf("%c", &letter);
+        switch (letter) {
+            case 'A':
+            scanf("%s %s", buffer1, buffer2);
+            numOfDrivers++;
+            racerTimes = add_driver(rep1, rep2, racerTimes, numOfDrivers);
+            break;
                 
             case 'U':
-                scanf("%s %d %d %d", buffer1, &hours, &minutes, &seconds);
-                updateTotalTime(buffer1, hours, minutes, seconds, driverTimes, numberOfElements);
+                scanf("%s %d %d %d", rep1, &hours, &minutes, &seconds);
+                updateTotalTime(rep1, hours, minutes, seconds, racerTimes, numOfDrivers);
                 break;
                 
             case 'L':
-                printResults(driverTimes, numberOfElements);
+                printResults(racerTimes, numOfDrivers);
                 break;
                 
             case  'W':
                 scanf("%s", buffer1);
-                saveResults(buffer1, driverTimes, numberOfElements);
+                saveResults(rep1, racerTimes, numOfDrivers);
                 break;
                 
             case 'O':
-                scanf("%s", buffer2);
-                loadResults(buffer2, driverTimes, numberOfElements);
+                scanf("%s", rep22);
+                loadResults(rep2, racerTimes, numOfDrivers);
                 break;
                 
             case 'Q':
-                FLAG = 0;
+                booll = 0;
                 break;
                 
             default:
+                printf("You did not enter a correct input");
                 break;
         }
 }
