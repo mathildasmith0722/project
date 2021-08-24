@@ -44,13 +44,11 @@ int update_time(char *lastname, int hours, int minutes, int seconds, struct Driv
     
 }
 
-int comparison(const void *racer_time1, const void racer_time2){
-    const struct Racer *order1 = racer_time1;
-    const struct Racer *order2 = racer_time2;
-    int time1 = (order1 -> racer_times.hours) + (order1 -> racer_times.minutes) (order1 -> racer_times.seconds)
-    int time2 = (order2 -> racer_times.hours) + (order2 -> racer_times.minutes) (order2 -> racer_times.seconds)
+int comparison(const void *racer_time1, const void *racer_time2){
+    int time_1 = ((struct Racer *)racer_time1) -> racer_times.hours) + ((struct Racer *)racer_time1) -> racer_times.minutes) ((struct Racer *)racer_time1) -> racer_times.seconds)
+    int time_2 = ((struct Racer *)racer_time2) -> racer_times.hours) + ((struct Racer *)racer_time2) -> racer_times.minutes) ((struct Racer *)racer_time2) -> racer_times.seconds)
 
-    return (time1 - time2);
+    return (time_1 - time_2);
 }
 
 int print_results(struct Racer *racerTimes, int numOfDrivers){
@@ -112,6 +110,7 @@ int main(){
     
     char letter;
     printf("Enter a letter: \n");
+
     while(booll){
         scanf("%c", &letter);
         switch (letter) {
@@ -148,8 +147,5 @@ int main(){
             default:
                 printf("You did not enter a correct input");
                 break;
-        }
-        
+        }       
 }
-
-
