@@ -1,8 +1,10 @@
-
+#include "rally.h"
+#include <stdlib.h>
+#include <string.h>
 
 
 struct Racer* add_driver(char *lastname, char *team, struct Racer *racerTimes, int numOfDrivers){
-
+    racerTimes = realloc(racerTimes,  numOfDrivers*sizeof(struct Racer));
 }
 
 int update_time(char *lastname, int hours, int minutes, int seconds, struct Driver *racerTimes, int numOfDrivers){
@@ -40,9 +42,9 @@ int comparison(const void *racer_time1, const void racer_time2){
     return (time1 - time2);
 }
 
-int print_results(struct Racer *racerTimes, int noDrivers){
-    qsort(racerTimes, noDrivers, sizeof(struct Racer), comparison);
-    for(int i=0; i< noDrivers; i++){
+int print_results(struct Racer *racerTimes, int numOfDrivers){
+    qsort(racerTimes, numOfDrivers, sizeof(struct Racer), comparison);
+    for(int i=0; i< numOfDrivers; i++){
         printf("%s %s %d:%d:%d\n", racerTimes[i].last_name, racerTimes[i].team,
         racerTimes[i].racer_time.hours, racerTimes[i].racer_time.minutes,
         racerTimes[i].racer_time.seconds);
