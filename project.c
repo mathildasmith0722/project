@@ -4,7 +4,18 @@
 
 
 struct Racer* add_driver(char *lastname, char *team, struct Racer *racerTimes, int numOfDrivers){
-    racerTimes = realloc(racerTimes,  numOfDrivers*sizeof(struct Racer));
+    racerTimes = realloc(driverTimes,  numOfDrivers*sizeof(struct Racer));
+    racerTimes[numOfDrivers - 1].lastname = malloc((strlen(lastname)+1)*sizeof(char));
+    racerTimes[numOfDrivers - 1].team = malloc((strlen(team)+1)*sizeof(char));
+
+    strcopy(racerTimes[numOfDrivers-1].lastname, lastname);
+    strcopy(racerTimes[numOfDrivers-1].team, team);
+
+    racerTimes[numOfDrivers - 1].racer_times.seconds = 0;
+    racerTimes[numOfDrivers - 1].racer_times.minutes = 0;
+    racerTimes[numOfDrivers - 1].racer_times.hours = 0;
+
+    return racerTimes;
 }
 
 int update_time(char *lastname, int hours, int minutes, int seconds, struct Driver *racerTimes, int numOfDrivers){
@@ -120,17 +131,18 @@ int main(){
                 break;
                 
             case  'W':
-                scanf("%s", buffer1);
+                scanf("%s", rep1);
                 saveResults(rep1, racerTimes, numOfDrivers);
                 break;
                 
             case 'O':
-                scanf("%s", rep22);
+                scanf("%s", rep2);
                 loadResults(rep2, racerTimes, numOfDrivers);
                 break;
                 
             case 'Q':
                 booll = 0;
+                exit_program(rep1, rep2, numOfDrivers)
                 break;
                 
             default:
@@ -139,4 +151,5 @@ int main(){
         }
         
 }
+
 
