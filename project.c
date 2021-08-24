@@ -78,6 +78,16 @@ int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
     return 0;
 }
 
+int exit_program(char *lastname, char *team, int numOfDrivers){
+    int i = 0;
+    while(i < numOfDrivers)
+    {
+        free(racerTimes[i].lastname);
+        free(racerTimes[i].team);
+    }
+    free(racerTimes);
+}
+
 int main(){
   
     int hours, minutes, seconds;
@@ -127,5 +137,6 @@ int main(){
                 printf("You did not enter a correct input");
                 break;
         }
+        
 }
 
