@@ -125,21 +125,21 @@ int main(){
                 
             case 'U':
                 scanf("%s %d %d %d", rep1, &hours, &minutes, &seconds);
-                updateTotalTime(rep1, hours, minutes, seconds, racerTimes, numOfDrivers);
+                update_time(rep1, hours, minutes, seconds, racerTimes, numOfDrivers);
                 break;
                 
             case 'L':
-                printResults(racerTimes, numOfDrivers);
+                print_results(racerTimes, numOfDrivers);
                 break;
                 
             case  'W':
                 scanf("%s", rep1);
-                saveResults(rep1, racerTimes, numOfDrivers);
+                save_results(rep1, racerTimes, numOfDrivers);
                 break;
                 
             case 'O':
                 scanf("%s", rep2);
-                loadResults(rep2, racerTimes, numOfDrivers);
+                load_results(rep2, racerTimes, numOfDrivers);
                 break;
                 
             case 'Q':
