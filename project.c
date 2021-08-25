@@ -88,14 +88,13 @@ int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
 }
 
 int exit_program(char *lastname, char *team, int numOfDrivers){
-    int i = 0;
-    while(i < numOfDrivers)
-    {
+    for(int i=0; i<numOfDrivers; i++){
         free(racerTimes[i].lastname);
         free(racerTimes[i].team);
     }
     free(racerTimes);
 }
+
 
 int main(){
   
@@ -147,5 +146,5 @@ int main(){
             default:
                 printf("You did not enter a correct input");
                 break;
-        }       
+        }        
 }
