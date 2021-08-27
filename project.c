@@ -1,67 +1,102 @@
 #include "project.h"
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
 
 
 struct Racer* add_driver(char *lastname, char *team, struct Racer *racerTimes, int numOfDrivers){
+
+    
     // loop through all drivers and compare the drivers being added to make sure it is not added twice
-    for(int i =0; i<numOfDrivers; i++){
-        if(strcmp(racerTimes[i].name, lastname) == 0){
-            printf("Racer already exists in the database.\n", lastname);
+    int i = 0;
+    while(i<numOfDrivers-1){
+        if(strcmp(racerTimes[i].lastname, lastname) == 0){
+            printf("Driver \"%s\" is already in the database.\n", lastname);
             return racerTimes;
-        } 
+        }
+        ++i;
     }
 
-    //reallocate memory for racerTimes to the correct size 
-    racerTimes = realloc(racerTimes, (numofDrivers+1)*sizeof(struct Racer));
+    //reallocate memory for racerTimes to the correct size
+ 
+    racerTimes = realloc(racerTimes, numOfDrivers*sizeof(struct Racer));
 
-    //dynamically allocate memory to both lastnames and team 
-    racerTimes[numOfDrivers].name = malloc((strlen(lastname)+1)*sizeof(char));
-    racerTimes[numOfDrivers].t= malloc((strlen(team)+1)*sizeof(char));
+    //dynamically allocate memory to both lastnames and team
+
+    racerTimes[numOfDrivers-1].lastname = calloc((strlen(lastname)+1), sizeof(char));
+    racerTimes[numOfDrivers-1].team= calloc((strlen(team)+1), sizeof(char));
 
     //copy the string to the correct arrays
-    strcpy(racerTimes[numOfDrivers].name, lastname);
-    strcpy(racerTimes[numOfDrivers].t, team);
 
-    // set all hours, minutes, seconds to 0 
-    racerTimes[numOfDrivers].racer_times.s = 0; 
-    racerTimes[numOfDrivers].racer_times.m = 0;
-    racerTimes[numOfDrivers].racer_times.h = 0;
+    strcpy(racerTimes[numOfDrivers-1].lastname, lastname);
+    strcpy(racerTimes[numOfDrivers-1].team, team);
 
-    numOfDrivers++;
+    // set all hours, minutes, seconds to 0
 
+    racerTimes[numOfDrivers-1].racer_times.seconds = 0; 
+    racerTimes[numOfDrivers-1].racer_times.minutes = 0;
+    racerTimes[numOfDrivers-1].racer_times.hours = 0;
+
+    printf("SUCCESS\n");
     return racerTimes;
 } 
 
 int update_time(char *lastname, int hours, int minutes, int seconds, struct Racer *racerTimes, int numOfDrivers){
     //create a temporary variable that ensures this racer exists in the database
-    int temp = 0;
 
-    //loop through all drivers 
-    for(int i=0; i<numOfDrivers; i++){
-        if(strcmp(racerTimes[i].name, lastname) == 0){
-            racerTimes[i].racer_times.h += hours;
-            racerTimes[i].racer_times.m += minutes;
-            racerTimes[i].racer_times.s += seconds;
+    int temp = -1;
 
-            //we can give the temp a value now that we know the racer exists
-            temp=1;
-   
-            //if minutes over 60, need to be added to hours
-            if(racerTimes[i].racer_times.minutes>=60){
-                racerTimes[i].racer_times.hours += racerTimes[i].racer_times.minutes/60;
-                racerTimes[i].racer_times.minutes += racerTimes[i].racer_times.minutes%60;
-            }
-            //if seconds are over 60, needs to be added to minutes
-            if(racerTimes[i].racer_times.seconds>=60){
-                racerTimes[i].racer_times.minutes += racerTimes[i].racer_times.seconds/60;
-                racerTimes[i].racer_times.seconds += racerTimes[i].racer_times.seconds%60;
+    //check that all seconds, minutes, hours are valid    
+
+    if((hours < 0)){
+        printf("Hour cannot be negative.\n");
+    }
+    else if((minutes >= 60) || (minutes< 0)){
+        printf("Minute cannot be negative or greater than 59.\n");
+    }
+
+    else if((seconds >= 60) || (seconds< 0)){
+        printf("Second cannot be negative or greater than 59.\n");
+    }
+
+    //loop through all drivers
+
+    else{
+        for(int i=0; i<numOfDrivers; i++){
+            if(strcmp(racerTimes[i].lastname, lastname) == 0){
+                racerTimes[i].racer_times.hours += hours;
+                racerTimes[i].racer_times.minutes += minutes;
+
+                //we can give the temp a value now that we know the racer exists
+
+                racerTimes[i].racer_times.seconds += seconds;
+                temp =1;
+
+                //if seconds are over 60, needs to be added to minutes
+
+                if(racerTimes[i].racer_times.seconds>=60){
+                    racerTimes[i].racer_times.minutes += racerTimes[i].racer_times.seconds/60;
+                    racerTimes[i].racer_times.seconds = racerTimes[i].racer_times.seconds%60;
+                }
+
+                //if minutes over 60, need to be added to hours
+
+                if(racerTimes[i].racer_times.minutes>=60){
+                    racerTimes[i].racer_times.hours += racerTimes[i].racer_times.minutes/60;
+                    racerTimes[i].racer_times.minutes = racerTimes[i].racer_times.minutes%60;
+                }
+                
+                printf("SUCCESS\n");  
             }
         }
     }
-    if(temp == 0){
-        printf("Error message driver has not been added to database");
+    //print error message if necessary
+
+    if(temp == -1){
+        printf("Driver \"%s\" is not in the database.n", lastname);
     }
+    
     return 0;
     
 }
@@ -77,112 +112,144 @@ int subtract(const void *racer_time1, const void *racer_time2){
     int time_2 = (time_22 -> racer_times.hours*60*60) + (time_22 -> racer_times.minutes*60) + (time_22 -> racer_times.seconds);
 
     return (time_1 - time_2);
-}
+} 
 
 int print_results(struct Racer *racerTimes, int numOfDrivers){
 
     //sort the drivers based on their times
-
     qsort(racerTimes, numOfDrivers, sizeof(struct Racer), subtract);
 
     //loop through all drivers and print the name, team, and time of the driver
 
     for(int i=0; i< numOfDrivers; i++){
-        printf("%s %s %d:%d:%d\n", racerTimes[i].name, racerTimes[i].t, racerTimes[i].racer_times.hours, racerTimes[i].racer_times.minutes, racerTimes[i].racer_times.seconds);
+        printf("%s %s %d %d %d\n", racerTimes[i].lastname, racerTimes[i].team, racerTimes[i].racer_times.hours, racerTimes[i].racer_times.minutes, racerTimes[i].racer_times.seconds);
     }
     return 0;
 }
 
 int save_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
 
-    //open the 
+    //open the file, ensure it can be opened
 
-    FILE *file_1 = fopen(filename, "a");
+    FILE *file_1 = fopen(filename, "w");
     if(!file_1){
-        printf("File cant be opened");
+        printf("File open error\n");
         return -1;
     }
+
+    qsort(racerTimes, numOfDrivers, sizeof(struct Racer), subtract);
+    //run through all the drivers and add their details to the file
+
     for(int i=0; i<numOfDrivers; i++){
-        fprintf(file_1, "%s %s %d %d %d", racerTimes[i].name, racerTimes[i].t, racerTimes[i].racer_times.hours, racerTimes[i].racer_times.minutes, racerTimes[i].racer_times.seconds);
+        fprintf(file_1, "%s %s %d %d %d", racerTimes[i].lastname, racerTimes[i].team, racerTimes[i].racer_times.hours, racerTimes[i].racer_times.minutes, racerTimes[i].racer_times.seconds);
     }
+    //close the file
+
     fclose(file_1);
     return 0;   
 }
 
 int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
-    FILE *file_1 = fopen(filename, "a");
+
+    //open the file, ensure it can be opened
+
+    FILE *file_1 = fopen(filename, "r");
     if(!file_1){
-        printf("File cant be opened");
+        printf("Cannot open file %s for reading.", filename);
         return -1;
     }
+    //run through all the drivers and scan their results
+
     for(int i=0; i<numOfDrivers; i++){
-        fscanf(file_1, "%s %s %d %d %d", racerTimes[i].name, racerTimes[i].t, &racerTimes[i].racer_times.hours, &racerTimes[i].racer_times.minutes, &racerTimes[i].racer_times.seconds);
+        fscanf(file_1, "%s %s %d %d %d", racerTimes[i].lastname, racerTimes[i].team, &racerTimes[i].racer_times.hours, &racerTimes[i].racer_times.minutes, &racerTimes[i].racer_times.seconds);
     }
+    //close the file
+
     fclose(file_1);
     return 0;
 }
 
 int exit_program(struct Racer *racerTimes, int numOfDrivers){
+    //loop through drivers and free the memory for the racer and team
+
     for(int i=0; i<numOfDrivers; i++){
-        free(racerTimes[i].name);
-        free(racerTimes[i].t);
+        free(racerTimes[i].lastname);
+        free(racerTimes[i].team);
     }
     free(racerTimes);
+    printf("SUCCESS\n");
     return 0;
 }
 
 
 int main(){
-  
+    //initialize all variables needed
+
     int hours, minutes, seconds;
     int numOfDrivers = 0;
     int booll= 1;
-  
-    char rep1[1000];
-    char rep2[1000];
+
+    //create two buffers and the racer times are empty
+
+    char rep1[1000] = {0};
+    char rep2[1000]  = {0};
+    char buffer[1000];
+    rep1[0] = 0;
+    rep2[0] = 0;
     struct Racer *racerTimes = NULL;
+    int x;
     
-    
-    char letter;
-    printf("Enter a letter: \n");
-
+    char letter[100];
     while(booll){
-
-        scanf("%c", &letter);
-
-        if(letter == 'A'){
-            scanf("%s %s", rep1, rep2);
-            numOfDrivers++;
-            racerTimes = add_driver(rep1, rep2, racerTimes, numOfDrivers);
-            break;
-        }                
-        else if(letter == 'U'){
-            scanf("%s %d %d %d", rep1, &hours, &minutes, &seconds);
-            update_time(rep1, hours, minutes, seconds, racerTimes, numOfDrivers);
-            break;
-        }       
-        else if(letter == 'L'){
-            print_results(racerTimes, numOfDrivers);
-            break;
-        }    
-        else if(letter == 'W'){
-            scanf("%s", rep1);
-            save_results(rep1, racerTimes, numOfDrivers);
-            break;
-        }    
-        else if(letter == 'O'){
-            scanf("%s", rep2);
-            load_results(rep2, racerTimes, numOfDrivers);
-            break;
-        }    
-        else if(letter == 'Q'){
-            booll = 0;
-            exit_program(racerTimes, numOfDrivers);
-            break;
-        }
-        else{
-            printf("You did not enter a correct input");
-            break;
-        }
+        fgets(buffer, 1000, stdin);
+        sscanf(buffer, "%s", letter);
+        switch(letter[0]){
+            case 'A':
+                x = sscanf(buffer, "%s %s %s", letter, rep1, rep2);
+                if(x<3){
+                    printf("A should be followed by exactly 2 arguments.\n");
+                }
+                else{ 
+                    racerTimes = add_driver(rep1, rep2, racerTimes, numOfDrivers);
+                    numOfDrivers++;
+                }
+                break;
+                           
+            case 'U':
+                x = sscanf(buffer, "%s %s %d %d %d", letter, rep1, &hours, &minutes, &seconds);
+                if(x<5){
+                    printf("U should be followed by exactly 4 arguments.\n");
+                }
+                else{
+                    update_time(rep1, hours, minutes, seconds, racerTimes, numOfDrivers);
+                }
+                break;  
+                   
+            case 'L':
+                print_results(racerTimes, numOfDrivers);
+                printf("SUCCESS\n");
+                break;
+                
+            case 'W':
+                sscanf(buffer, "%s %s", letter, rep1);
+                save_results(rep1, racerTimes, numOfDrivers);
+                printf("SUCCESS\n");
+                break;
+                
+            case 'O':
+                sscanf(buffer, "%s %s", letter, rep2);
+                load_results(rep2, racerTimes, numOfDrivers);
+                printf("SUCCESS\n");
+                break;
+                
+            case 'Q':
+                booll = 0;
+                exit_program(racerTimes, numOfDrivers);
+                break;
+            
+            default:
+                printf("Invalid command %s", letter);
+        }   
     }
-} 
+    return 0;
+}
