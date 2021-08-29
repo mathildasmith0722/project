@@ -10,33 +10,34 @@ struct Racer* add_driver(char *lastname, char *team, struct Racer *racerTimes, i
     
     // loop through all drivers and compare the drivers being added to make sure it is not added twice
     int i = 0;
-    while(i<numOfDrivers-1){
+    while(i<numOfDrivers){
         if(strcmp(racerTimes[i].lastname, lastname) == 0){
             printf("Driver \"%s\" is already in the database.\n", lastname);
-            return racerTimes;
+            return NULL;
         }
         ++i;
     }
 
     //reallocate memory for racerTimes to the correct size
  
-    racerTimes = realloc(racerTimes, numOfDrivers*sizeof(struct Racer));
+    racerTimes = realloc(racerTimes, (numOfDrivers+1)*sizeof(struct Racer));
 
     //dynamically allocate memory to both lastnames and team
 
-    racerTimes[numOfDrivers-1].lastname = calloc((strlen(lastname)+1), sizeof(char));
-    racerTimes[numOfDrivers-1].team= calloc((strlen(team)+1), sizeof(char));
+    racerTimes[numOfDrivers].lastname = calloc( (strlen(lastname)+1), sizeof(char) );
+    racerTimes[numOfDrivers].team= calloc((strlen(team)+1), sizeof(char));
 
     //copy the string to the correct arrays
 
-    strcpy(racerTimes[numOfDrivers-1].lastname, lastname);
-    strcpy(racerTimes[numOfDrivers-1].team, team);
+    strcpy(racerTimes[numOfDrivers].lastname, lastname);
+    strcpy(racerTimes[numOfDrivers].team, team);
+
 
     // set all hours, minutes, seconds to 0
 
-    racerTimes[numOfDrivers-1].racer_times.seconds = 0; 
-    racerTimes[numOfDrivers-1].racer_times.minutes = 0;
-    racerTimes[numOfDrivers-1].racer_times.hours = 0;
+    racerTimes[numOfDrivers].racer_times.seconds = 0; 
+    racerTimes[numOfDrivers].racer_times.minutes = 0;
+    racerTimes[numOfDrivers].racer_times.hours = 0;
 
     printf("SUCCESS\n");
     return racerTimes;
@@ -51,13 +52,16 @@ int update_time(char *lastname, int hours, int minutes, int seconds, struct Race
 
     if((hours < 0)){
         printf("Hour cannot be negative.\n");
+        return 0; 
     }
     else if((minutes >= 60) || (minutes< 0)){
         printf("Minute cannot be negative or greater than 59.\n");
+        return 0;
     }
 
     else if((seconds >= 60) || (seconds< 0)){
         printf("Second cannot be negative or greater than 59.\n");
+        return 0; 
     }
 
     //loop through all drivers
@@ -94,7 +98,7 @@ int update_time(char *lastname, int hours, int minutes, int seconds, struct Race
     //print error message if necessary
 
     if(temp == -1){
-        printf("Driver \"%s\" is not in the database.n", lastname);
+        printf("Driver \"%s\" is not in the database.\n", lastname);
     }
     
     return 0;
@@ -155,7 +159,7 @@ int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
 
     FILE *file_1 = fopen(filename, "r");
     if(!file_1){
-        printf("Cannot open file %s for reading.", filename);
+        printf("Cannot open file %s for reading.\n", filename);
         return -1;
     }
     //run through all the drivers and scan their results
@@ -166,6 +170,7 @@ int load_results(char *filename, struct Racer *racerTimes, int numOfDrivers){
     //close the file
 
     fclose(file_1);
+    printf("SUCCESS\n");
     return 0;
 }
 
@@ -182,7 +187,7 @@ int exit_program(struct Racer *racerTimes, int numOfDrivers){
 }
 
 
-int main(){
+int main(void){
     //initialize all variables needed
 
     int hours, minutes, seconds;
@@ -192,14 +197,14 @@ int main(){
     //create two buffers and the racer times are empty
 
     char rep1[1000] = {0};
-    char rep2[1000]  = {0};
-    char buffer[1000];
-    rep1[0] = 0;
-    rep2[0] = 0;
+    char rep2[1000] = {0};
+    char buffer[1000] = {0};
     struct Racer *racerTimes = NULL;
+    
     int x;
     
-    char letter[100];
+    
+    char letter[100] = {0};
     while(booll){
         fgets(buffer, 1000, stdin);
         sscanf(buffer, "%s", letter);
@@ -209,9 +214,12 @@ int main(){
                 if(x<3){
                     printf("A should be followed by exactly 2 arguments.\n");
                 }
-                else{ 
-                    racerTimes = add_driver(rep1, rep2, racerTimes, numOfDrivers);
-                    numOfDrivers++;
+                else{
+                    struct Racer *racerTimes2 = add_driver(rep1, rep2, racerTimes, numOfDrivers);
+                    if (racerTimes2 != NULL){
+                        numOfDrivers++;
+                        racerTimes = racerTimes2;
+                    }  
                 }
                 break;
                            
@@ -239,7 +247,6 @@ int main(){
             case 'O':
                 sscanf(buffer, "%s %s", letter, rep2);
                 load_results(rep2, racerTimes, numOfDrivers);
-                printf("SUCCESS\n");
                 break;
                 
             case 'Q':
@@ -248,7 +255,7 @@ int main(){
                 break;
             
             default:
-                printf("Invalid command %s", letter);
+                printf("Invalid command %s\n", letter);
         }   
     }
     return 0;
